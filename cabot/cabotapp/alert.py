@@ -32,7 +32,7 @@ telephone_template = "This is an urgent message from Arachnys monitoring. Servic
 
 
 def send_alert(service, duty_officers=None):
-    users = service.users_to_notify.all()
+    users = service.users_to_notify.filter(is_active=True)
     if service.email_alert:
         send_email_alert(service, users, duty_officers)
     if service.hipchat_alert:
@@ -98,6 +98,7 @@ def send_chat_alert(chat_type, service, users, duty_officers):
         'host': settings.WWW_HTTP_HOST,
         'scheme': settings.WWW_SCHEME,
         'alert': alert,
+        'jenkins_api': settings.JENKINS_API,
     })
     message = Template(chat_template).render(c)
     _send_chat_alert(chat_type, message, color=color, sender='Cabot/%s' % service.name)
